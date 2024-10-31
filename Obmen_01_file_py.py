@@ -10,11 +10,13 @@ def update_t_label(event):
     name = cur[code]
     t_label.config(text=name)
 
+
 def update_b_label(event):
     # Получаем полное название валюты из словаря и обновляем метку
     code = b_combobox.get()
     name = cur[code]
     b_label.config(text=name)
+
 
 def update_s_label(event):
     # Получаем полное название валюты из словаря и обновляем метку
@@ -22,22 +24,31 @@ def update_s_label(event):
     name = cur[code]
     s_label.config(text=name)
 
+
 def exchange():
-    t_code = t_combobox.get()
     b_code = b_combobox.get()
+    s_code = s_combobox.get()
+    t_code = t_combobox.get()
 
-    if t_code and b_code:
+    if t_code and b_code and s_code:
         try:
-            response = requests.get(f'https://open.er-api.com/v6/latest/{b_code}')
-            response.raise_for_status()
+            b_response = requests.get(f'https://open.er-api.com/v6/latest/{b_code}')
+            b_response.raise_for_status()
+            s_response = requests.get(f'https://open.er-api.com/v6/latest/{s_code}')
+            s_response.raise_for_status()
 
-            data = response.json()
+            b_data = b_response.json()
+            s_data = s_response.json()
 
-            if t_code in data['rates']:
-                exchange_rate = data['rates'][t_code]
+            if t_code in s_data['rates'] and t_code in b_data['rates']:
+                b_exchange_rate = b_data['rates'][t_code]
+                s_exchange_rate = s_data['rates'][t_code]
+
                 b_name = cur[b_code]
                 t_name = cur[t_code]
-                mb.showinfo("Курс обмена", f"Курс {exchange_rate:.2f} {t_name} за 1 {b_name}")
+                s_name = cur[s_code]
+                mb.showinfo("Курс обмена", f"Курс {b_exchange_rate:.2f} {t_name} за 1 {b_name} "
+                                           f"и {s_exchange_rate:.2f} {t_name} за 1 {s_name}")
             else:
                 mb.showerror("Ошибка", f"Валюта {t_code} не найдена")
         except Exception as e:
@@ -50,13 +61,13 @@ def exchange():
 cur = {
     "USD": "Американский доллар",
     "EUR": "Евро",
+    "RUB": "Российский рубль",
     "JPY": "Японская йена",
     "GBP": "Британский фунт стерлингов",
     "AUD": "Австралийский доллар",
     "CAD": "Канадский доллар",
     "CHF": "Швейцарский франк",
     "CNY": "Китайский юань",
-    "RUB": "Российский рубль",
     "KZT": "Казахстанский тенге",
     "UZS": "Узбекский сум"
 }
@@ -86,8 +97,6 @@ t_combobox.pack(padx=10, pady=5)
 t_combobox.bind("<<ComboboxSelected>>", update_t_label)
 t_label = ttk.Label()
 t_label.pack(padx=10, pady=10)
-
-
 
 Button(text="Получить курс обмена", command=exchange).pack(padx=10, pady=10)
 
