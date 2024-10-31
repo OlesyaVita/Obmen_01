@@ -4,12 +4,23 @@ from tkinter import messagebox as mb
 import requests
 
 
-def update_c_label(event):
+def update_t_label(event):
     # Получаем полное название валюты из словаря и обновляем метку
     code = t_combobox.get()
     name = cur[code]
-    c_label.config(text=name)
+    t_label.config(text=name)
 
+def update_b_label(event):
+    # Получаем полное название валюты из словаря и обновляем метку
+    code = b_combobox.get()
+    name = cur[code]
+    b_label.config(text=name)
+
+def update_s_label(event):
+    # Получаем полное название валюты из словаря и обновляем метку
+    code = s_combobox.get()
+    name = cur[code]
+    s_label.config(text=name)
 
 def exchange():
     t_code = t_combobox.get()
@@ -53,19 +64,30 @@ cur = {
 # Создание графического интерфейса
 window = Tk()
 window.title("Курс обмена валюты")
-window.geometry("360x200")
+window.geometry("250x400")
 
 Label(text="Базовая валюта:").pack(padx=10, pady=5)
 b_combobox = ttk.Combobox(values=list(cur.keys()))
 b_combobox.pack(padx=10, pady=5)
+b_combobox.bind("<<ComboboxSelected>>", update_b_label)
+b_label = ttk.Label()
+b_label.pack(padx=10, pady=10)
+
+Label(text="Вторая базовая валюта:").pack(padx=10, pady=5)
+s_combobox = ttk.Combobox(values=list(cur.keys()))
+s_combobox.pack(padx=10, pady=5)
+s_combobox.bind("<<ComboboxSelected>>", update_s_label)
+s_label = ttk.Label()
+s_label.pack(padx=10, pady=10)
 
 Label(text="Целевая валюта:").pack(padx=10, pady=5)
 t_combobox = ttk.Combobox(values=list(cur.keys()))
 t_combobox.pack(padx=10, pady=5)
-t_combobox.bind("<<ComboboxSelected>>", update_c_label)
+t_combobox.bind("<<ComboboxSelected>>", update_t_label)
+t_label = ttk.Label()
+t_label.pack(padx=10, pady=10)
 
-c_label = ttk.Label()
-c_label.pack(padx=10, pady=10)
+
 
 Button(text="Получить курс обмена", command=exchange).pack(padx=10, pady=10)
 
